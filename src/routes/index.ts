@@ -1,0 +1,40 @@
+import { Router } from 'express';
+import authRoutes from './auth.routes';
+import userRoutes from './user.routes';
+import patientRoutes from './patient.routes';
+import visitRoutes from './visit.routes';
+import consultationRoutes from './consultation.routes';
+import prescriptionRoutes from './prescription.routes';
+import labRoutes from './lab.routes';
+import billingRoutes from './billing.routes';
+import inventoryRoutes from './inventory.routes';
+import auditRoutes from './audit.routes';
+import dashboardRoutes from './dashboard.routes';
+import vitalsRoutes from './vitals.routes';
+import wardRoutes from './ward.routes';
+import admissionRoutes from './admission.routes';
+import roundRoutes from './round.routes';
+import reviewRoutes from './review.routes';
+import settingsRoutes from './settings.routes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/patients', patientRoutes);
+router.use('/visits', visitRoutes);
+router.use('/consultations', consultationRoutes);
+router.use('/prescriptions', prescriptionRoutes);
+router.use('/lab-orders', labRoutes);
+router.use('/billing', billingRoutes);
+router.use('/inventory', inventoryRoutes);
+router.use('/audit', auditRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/vitals', vitalsRoutes);
+router.use('/wards', wardRoutes);
+router.use('/admissions', admissionRoutes);
+router.use('/rounds', roundRoutes);
+router.use('/reviews', reviewRoutes);
+router.use('/settings', settingsRoutes);
+
+export default router;
