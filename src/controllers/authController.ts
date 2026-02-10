@@ -258,6 +258,84 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
   }
 };
 
+// First-time setup - creates initial superadmin when no users exist
+export const initialSetup = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { email, password, firstName, lastName } = req.body;
+
+    // Check if any users exist
+    const userCount = await prisma.user.count();
+    if (userCount > 0) {
+      res.status(403).json({ error: 'Setup already completed. Users already exist.' });
+      return;
+    }
+
+    // Validate input
+    if (!email || !password || !firstName || !lastName) {
+      res.status(400).json({ error: 'Email, password, firstName, and lastName are required' });
+      return;
+    }
+
+    if (password.length < 8) {
+      res.status(400).json({ error: 'Password must be at least 8 characters' });
+      return;
+    }
+
+    // Create the initial superadmin
+    const hashedPassword = await hashPassword(password);
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        role: 'SUPER_ADMIN',
+        active: true,
+      },
+    });
+
+    // Generate tokens
+    const userPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      hospitalId: user.hospitalId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
+
+    const accessToken = generateAccessToken(userPayload);
+    const refreshToken = generateRefreshToken(userPayload);
+
+    // Store refresh token
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 7);
+    await prisma.refreshToken.create({
+      data: {
+        token: refreshToken,
+        userId: user.id,
+        expiresAt,
+      },
+    });
+
+    res.status(201).json({
+      message: 'Initial setup complete. Superadmin created.',
+      accessToken,
+      refreshToken,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    console.error('Initial setup error:', error);
+    res.status(500).json({ error: 'Setup failed' });
+  }
+};
+
 export const getMe = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
