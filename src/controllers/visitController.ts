@@ -53,7 +53,7 @@ export const checkIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const { patientId, department, reasonForVisit, assignedTo } = req.body;
+    const { id: clientId, patientId, department, reasonForVisit, assignedTo } = req.body;
 
     if (!patientId || !department || !reasonForVisit) {
       res.status(400).json({ error: 'Missing required fields' });
@@ -74,9 +74,10 @@ export const checkIn = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    // Create visit
+    // Create visit (use client ID if provided for offline sync)
     const visit = await prisma.visit.create({
       data: {
+        ...(clientId && { id: clientId }),  // Use client ID if provided
         hospitalId: patient.hospitalId,
         patientId,
         department,

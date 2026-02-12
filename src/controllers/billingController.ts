@@ -11,7 +11,7 @@ export const createBill = async (req: Request, res: Response): Promise<void> => 
       return;
     }
 
-    const { visitId, patientId, items, insuranceProvider, insurancePolicyNumber, insuranceCoverage } = req.body;
+    const { id: clientId, visitId, patientId, items, insuranceProvider, insurancePolicyNumber, insuranceCoverage } = req.body;
 
     if (!visitId || !patientId || !items || items.length === 0) {
       res.status(400).json({ error: 'Missing required fields' });
@@ -39,6 +39,7 @@ export const createBill = async (req: Request, res: Response): Promise<void> => 
     // Create billing record with items and optional insurance info
     const billingRecord = await prisma.billingRecord.create({
       data: {
+        ...(clientId && { id: clientId }),  // Use client ID if provided for offline sync
         visitId,
         patientId,
         hospitalId: visit.hospitalId,

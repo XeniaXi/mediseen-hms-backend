@@ -12,6 +12,7 @@ export const createPatient = async (req: Request, res: Response): Promise<void> 
     }
 
     const {
+      id: clientId,  // Accept client-generated ID for offline sync
       firstName,
       lastName,
       dateOfBirth,
@@ -43,9 +44,10 @@ export const createPatient = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    // Create patient
+    // Create patient (use client ID if provided for offline sync support)
     const patient = await prisma.patient.create({
       data: {
+        ...(clientId && { id: clientId }),  // Use client ID if provided
         hospitalId,
         firstName,
         lastName,
