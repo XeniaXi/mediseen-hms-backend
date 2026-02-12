@@ -54,4 +54,24 @@ router.get(
 
 router.get('/:id', param('id').isUUID().withMessage('Valid visit ID required'), getVisitById);
 
+// Delete visit (SUPER_ADMIN only)
+router.delete(
+  '/:id',
+  authorize('SUPER_ADMIN'),
+  param('id').isUUID().withMessage('Valid visit ID required'),
+  async (req, res) => {
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      // Delete related billing records first
+      await prisma.billingRecord.deleteMany({ where: { visitId: req.params.id } });
+      // Delete the visit
+      await prisma.visit.delete({ where: { id: req.params.id } });
+      res.json({ message: 'Visit deleted successfully' });
+    } catch (error: any) {
+      res.status(500).json({ error: 'Failed to delete visit', details: error.message });
+    }
+  }
+);
+
 export default router;
