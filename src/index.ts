@@ -12,7 +12,7 @@ import 'dotenv/config';
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://app.mediseenhms.com,https://mediseenhms.com,https://www.mediseenhms.com,https://mediseen-hms.vercel.app,http://localhost:3000';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://app.mediseenhms.com,https://mediseenhms.com,https://www.mediseenhms.com,https://mediseen-hms.vercel.app,https://build-omega-flax.vercel.app,http://localhost:3000';
 
 // Middleware
 app.use(
