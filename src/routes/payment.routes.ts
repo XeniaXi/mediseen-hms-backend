@@ -12,8 +12,8 @@ const router = Router();
 
 // Paystack API response types
 interface PaystackResponse {
-  status: boolean;
-  message: string;
+  status?: boolean;
+  message?: string;
   data?: {
     authorization_url?: string;
     access_code?: string;
@@ -21,6 +21,7 @@ interface PaystackResponse {
     amount?: number;
     currency?: string;
     channel?: string;
+    status?: string;
     paid_at?: string;
     customer?: {
       email?: string;
