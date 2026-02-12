@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
+import hospitalRoutes from './hospital.routes';
 import patientRoutes from './patient.routes';
 import visitRoutes from './visit.routes';
 import consultationRoutes from './consultation.routes';
@@ -16,11 +17,13 @@ import admissionRoutes from './admission.routes';
 import roundRoutes from './round.routes';
 import reviewRoutes from './review.routes';
 import settingsRoutes from './settings.routes';
+import paymentRoutes from './payment.routes';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
+router.use('/hospitals', hospitalRoutes);
 router.use('/patients', patientRoutes);
 router.use('/visits', visitRoutes);
 router.use('/consultations', consultationRoutes);
@@ -36,5 +39,6 @@ router.use('/admissions', admissionRoutes);
 router.use('/rounds', roundRoutes);
 router.use('/reviews', reviewRoutes);
 router.use('/settings', settingsRoutes);
+router.use('/payments', paymentRoutes);
 
 export default router;
