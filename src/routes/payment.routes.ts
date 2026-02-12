@@ -10,6 +10,25 @@ import crypto from 'crypto';
 
 const router = Router();
 
+// Paystack API response types
+interface PaystackResponse {
+  status: boolean;
+  message: string;
+  data?: {
+    authorization_url?: string;
+    access_code?: string;
+    reference?: string;
+    amount?: number;
+    currency?: string;
+    channel?: string;
+    paid_at?: string;
+    customer?: {
+      email?: string;
+    };
+    metadata?: Record<string, any>;
+  };
+}
+
 // SECURITY: Secret key from environment only
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
 const PAYSTACK_WEBHOOK_SECRET = process.env.PAYSTACK_WEBHOOK_SECRET;
@@ -52,7 +71,7 @@ router.post('/initialize', async (req: Request, res: Response) => {
       }),
     });
 
-    const data = await response.json();
+    const data: PaystackResponse = await response.json();
 
     if (!response.ok) {
       console.error('[Payment] Paystack initialization failed:', data);
@@ -111,7 +130,7 @@ router.post('/verify', async (req: Request, res: Response) => {
       }
     );
 
-    const data = await response.json();
+    const data: PaystackResponse = await response.json();
 
     if (!response.ok) {
       return res.status(response.status).json({
@@ -233,7 +252,7 @@ router.get('/banks', async (_req: Request, res: Response) => {
       },
     });
 
-    const data = await response.json();
+    const data: { data?: any[] } = await response.json();
     return res.json({
       status: true,
       data: data.data || [],
