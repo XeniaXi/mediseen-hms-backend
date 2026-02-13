@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import { createServer } from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -8,6 +9,7 @@ import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { auditMiddleware } from './middleware/auditMiddleware';
 import { prisma } from './db';
+import { initializeSocket } from './socket';
 import 'dotenv/config';
 
 const app: Application = express();
@@ -73,6 +75,12 @@ const shutdown = async () => {
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
+// Create HTTP server for Express + WebSocket
+const httpServer = createServer(app);
+
+// Initialize WebSocket server
+const io = initializeSocket(httpServer);
+
 // Start server
 const startServer = async () => {
   try {
@@ -80,10 +88,11 @@ const startServer = async () => {
     await prisma.$connect();
     console.log('✅ Database connected');
 
-    app.listen(PORT, () => {
+    httpServer.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
       console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔐 CORS enabled for: ${CORS_ORIGIN}`);
+      console.log(`🔌 WebSocket server ready`);
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
@@ -93,4 +102,5 @@ const startServer = async () => {
 
 startServer();
 
+export { io };
 export default app;

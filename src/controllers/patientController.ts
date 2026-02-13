@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { createAuditLog } from '../utils/audit';
+import { broadcastPatientUpdate } from '../socket';
 
 const prisma = new PrismaClient();
 
@@ -82,6 +83,9 @@ export const createPatient = async (req: Request, res: Response): Promise<void> 
       ipAddress: String(req.ip || req.socket.remoteAddress || ''),
       userAgent: String(req.headers['user-agent'] || ''),
     });
+
+    // Broadcast to all connected clients in this hospital
+    broadcastPatientUpdate(req.user.hospitalId, 'created', patient);
 
     res.status(201).json({ patient });
   } catch (error) {
