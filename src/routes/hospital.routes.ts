@@ -17,6 +17,32 @@ router.use(authenticate);
 // Get all hospitals (platform admin only)
 router.get('/', getHospitals);
 
+// Get hospital by slug (for patient portal - no auth required)
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { prisma } = require('../db');
+    
+    // Find hospital by name slug (lowercase, hyphenated)
+    const hospitals = await prisma.hospital.findMany({
+      where: { active: true },
+      select: { id: true, name: true, logo: true, email: true },
+    });
+    
+    const hospital = hospitals.find((h: any) => 
+      h.name.toLowerCase().replace(/\s+/g, '-') === slug.toLowerCase()
+    );
+    
+    if (!hospital) {
+      return res.status(404).json({ error: 'Hospital not found' });
+    }
+    
+    res.json({ hospital });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch hospital' });
+  }
+});
+
 // Get single hospital
 router.get('/:id', getHospital);
 
