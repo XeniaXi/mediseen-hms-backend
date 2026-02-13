@@ -5,12 +5,23 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
+import * as Sentry from '@sentry/node';
 import routes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import { auditMiddleware } from './middleware/auditMiddleware';
 import { prisma } from './db';
 import { initializeSocket } from './socket';
 import 'dotenv/config';
+
+// Initialize Sentry for error monitoring
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    tracesSampleRate: 0.1,
+  });
+  console.log('✅ Sentry initialized');
+}
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
