@@ -129,6 +129,7 @@ model Hospital {
   logo      String?
   settings  Json?
   active    Boolean  @default(true)
+  isOnboarded Boolean @default(false) // Set true after initial setup wizard
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

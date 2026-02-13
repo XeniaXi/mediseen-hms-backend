@@ -61,6 +61,28 @@ router.post(
 // Update hospital
 router.put('/:id', updateHospital);
 
+// Mark hospital onboarding complete
+router.post('/:id/onboarding-complete', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { prisma } = require('../db');
+    
+    // Only allow if user belongs to this hospital
+    if (req.user?.hospitalId !== id && req.user?.role !== 'SUPER_ADMIN') {
+      return res.status(403).json({ error: 'Not authorized' });
+    }
+    
+    const hospital = await prisma.hospital.update({
+      where: { id },
+      data: { isOnboarded: true },
+    });
+    
+    res.json({ success: true, hospital });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to complete onboarding' });
+  }
+});
+
 // Delete/deactivate hospital
 router.delete('/:id', deleteHospital);
 
