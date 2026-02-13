@@ -12,25 +12,25 @@ import 'dotenv/config';
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'https://app.mediseenhms.com,https://mediseenhms.com,https://www.mediseenhms.com,https://mediseen-hms.vercel.app,https://build-omega-flax.vercel.app,http://localhost:3000';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
 
 // Middleware
 app.use(
   cors({
-    origin: CORS_ORIGIN.split(','),
+    origin: CORS_ORIGIN.split(',').map(s => s.trim()),
     credentials: true,
   })
 );
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(cookieParser());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requests per windowMs
+  max: 20, // 20 requests per windowMs — stricter for auth endpoints
   message: 'Too many authentication attempts, please try again later',
 });
 

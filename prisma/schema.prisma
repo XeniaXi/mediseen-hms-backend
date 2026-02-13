@@ -132,6 +132,14 @@ model Hospital {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Subscription management
+  subscriptionTier   String   @default("FREE_TRIAL") // FREE_TRIAL, STARTER, PROFESSIONAL, ENTERPRISE
+  subscriptionPeriod String   @default("monthly")    // monthly, quarterly, biannual, annual
+  subscriptionStatus String   @default("TRIAL")      // TRIAL, ACTIVE, EXPIRED, SUSPENDED, CANCELLED
+  subscriptionStart  DateTime @default(now())
+  subscriptionEnd    DateTime?
+  trialEndsAt        DateTime?
+
   users            User[]
   patients         Patient[]
   visits           Visit[]
@@ -143,6 +151,7 @@ model Hospital {
   admissions       Admission[]
 
   @@index([active])
+  @@index([subscriptionStatus])
 }
 
 model User {

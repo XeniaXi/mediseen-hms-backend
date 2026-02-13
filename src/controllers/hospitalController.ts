@@ -50,6 +50,10 @@ export const createHospital = async (req: Request, res: Response): Promise<void>
       adminLastName,
       adminPhone,
       settings,
+      // Subscription fields
+      subscriptionTier,
+      subscriptionPeriod,
+      subscriptionStatus,
     } = req.body;
 
     // Validate required fields
@@ -74,7 +78,12 @@ export const createHospital = async (req: Request, res: Response): Promise<void>
 
     // Create hospital and admin user in a transaction
     const result = await prisma.$transaction(async (tx) => {
-      // Create hospital
+      // Calculate trial/subscription dates
+      const now = new Date();
+      const trialDays = 14;
+      const trialEnd = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+      
+      // Create hospital with subscription
       const hospital = await tx.hospital.create({
         data: {
           name,
@@ -82,6 +91,13 @@ export const createHospital = async (req: Request, res: Response): Promise<void>
           phone: phone || '',
           email,
           settings: settings || {},
+          // Subscription management
+          subscriptionTier: subscriptionTier || 'FREE_TRIAL',
+          subscriptionPeriod: subscriptionPeriod || 'monthly',
+          subscriptionStatus: subscriptionStatus || 'TRIAL',
+          subscriptionStart: now,
+          subscriptionEnd: subscriptionStatus === 'ACTIVE' ? null : trialEnd,
+          trialEndsAt: trialEnd,
         }
       });
 
