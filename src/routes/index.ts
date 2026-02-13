@@ -41,4 +41,9 @@ router.use('/reviews', reviewRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/payments', paymentRoutes);
 
+// Sentry test endpoint (remove in production after testing)
+router.get('/sentry-test', (req, res) => {
+  throw new Error('Sentry test error - this is intentional!');
+});
+
 export default router;
